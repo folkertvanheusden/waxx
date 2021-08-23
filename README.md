@@ -1,2 +1,2 @@
-This program requires https://github.com/flok99/python-ataxx
+This program requires https://github.com/kz04px/python-ataxx
 and https://github.com/HankSheehan/EloPy
