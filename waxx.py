@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! /usr/bin/python3.7
 
 import asyncio
 import gc
@@ -186,6 +186,7 @@ async def ws_serve(websocket, path_in):
 
     except Exception as e:
         flog('%s] ws_serve: %s' % (e, remote_addr))
+
         fh = open(logfile, 'a')
         traceback.print_exc(file=fh)
         fh.close()
@@ -432,7 +433,7 @@ def play_game(p1_in, p2_in, t, time_buffer_soft, time_buffer_hard):
             t_left = t + time_buffer_soft - took * 1000
             if t_left < 0 and reason == None:
                 reason = '%s used too much time (W)' % side
-                log_msg = '%s used %fms too much time' % (who, -round(t_left, 3))
+                log_msg = '%s used %fms too much time (took: %f, allowed: %f)' % (who, -round(t_left, 3), took, t)
                 add_ws_msg_record(pair, reason)
                 flog(log_msg)
 
@@ -467,7 +468,7 @@ def play_game(p1_in, p2_in, t, time_buffer_soft, time_buffer_hard):
                 is_legal = board.is_legal(move)
 
             except Exception as e:
-                flog('%s) move is in invalid: %s' % (who, e))
+                flog('%s) (threw) move is in invalid: %s' % (who, e))
 
             if not is_legal:
                 illegal_move = bestmove
@@ -513,7 +514,7 @@ def play_game(p1_in, p2_in, t, time_buffer_soft, time_buffer_hard):
             p1_in[0].isready(5)
             p2_in[0].isready(5)
         except Exception as e:
-            flog('isready failed: %s' % e)
+            flog('(threw) isready failed: %s' % e)
 
         game = ataxx.pgn.Game()
         last_node = game.from_board(board)
@@ -625,7 +626,7 @@ def play_game(p1_in, p2_in, t, time_buffer_soft, time_buffer_hard):
             add_ws_msg_record(pair, txt)
 
     except Exception as e:
-        flog('failure: %s (%s)' % (e, pair))
+        flog('(threw) failure: %s (%s)' % (e, pair))
         fh = open(logfile, 'a')
         traceback.print_exc(file=fh)
         fh.close()
@@ -643,7 +644,7 @@ def play_game(p1_in, p2_in, t, time_buffer_soft, time_buffer_hard):
             p1_in[0].quit()
             del p1_in
     except Exception as e:
-        flog('failure: %s (%s)' % (e, pair))
+        flog('(threw) failure: %s (%s)' % (e, pair))
         fh = open(logfile, 'a')
         traceback.print_exc(file=fh)
         fh.close()
@@ -655,7 +656,7 @@ def play_game(p1_in, p2_in, t, time_buffer_soft, time_buffer_hard):
             p2_in[0].quit()
             del p2_in
     except Exception as e:
-        flog('failure: %s (%s)' % (e, pair))
+        flog('(threw) failure: %s (%s)' % (e, pair))
         fh = open(logfile, 'a')
         traceback.print_exc(file=fh)
         fh.close()
@@ -715,25 +716,18 @@ def match_scheduler():
                     while len(opponents) > 2:
                         del opponents[0]
 
-                for attempt in range(0, 5):
+                for attempt in range(0, len(idle_clients)):
                     p1 = find_client_idle(idle_clients, random.choice(user_names))
                     p2 = find_client_idle(idle_clients, random.choice(user_names))
 
                     if p1 != p2:
-                        ok = False
-
                         if (p1, p2) not in matches:
                             flog('random pairs, scheduling game %s %s (and vice versa)' % (p1[1], p2[1]))
                             matches.append((p1, p2))
-                            ok = True
 
                         if (p2, p1) not in matches:
                             flog('random pairs, scheduling game %s %s (and vice versa)' % (p2[1], p1[1]))
                             matches.append((p2, p1))
-                            ok = True
-
-                        if ok:
-                            break
 
 
             flog('idle: %d, playing: %d, matches: %d' % (n_idle, n_play * 2, len(matches)))
@@ -867,7 +861,7 @@ def add_client(sck, addr):
         schedule_matches_for_new_player(new_client)
 
     except Exception as e:
-        flog('Fail: %s' % e)
+        flog('(threw) Fail: %s' % e)
         sck.close()
         traceback.print_exc(file=sys.stdout)
 

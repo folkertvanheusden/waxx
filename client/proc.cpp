@@ -19,8 +19,6 @@ std::tuple<pid_t, int, int> exec_with_pipe(const char *const command)
 		dup(pipe_to_proc[0]);
 		close(pipe_to_proc[1]);
 		close(1);
-		close(2);
-		dup(pipe_from_proc[1]);
 		dup(pipe_from_proc[1]);
 		close(pipe_from_proc[0]);
 

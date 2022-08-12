@@ -1,6 +1,7 @@
 #include <getopt.h>
 #include <poll.h>
 #include <signal.h>
+#include <stdio.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
