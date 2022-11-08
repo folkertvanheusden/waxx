@@ -18,7 +18,7 @@ def usage():
     print('-P x  password to use')
 
 engine = None
-host = 'server.ataxx.org'
+host = 'ataxx.vanheusden.com'
 port = 28028
 user = None
 password = None

@@ -36,7 +36,7 @@ void help(void)
 int main(int argc, char **argv)
 {
 	const char *proc = nullptr;
-	const char *host = "server.ataxx.org";
+	const char *host = "ataxx.vanheusden.com";
 	int port = 28028;
 	int c = -1;
 	const char *user = nullptr, *password = nullptr;
